@@ -1,0 +1,25 @@
+{
+  "name": "mcpserver-for-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A small LAN-ready MCP toolchain for generating business briefs.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:docs": "node dist/servers/docs-server.js",
+    "start:sales": "node dist/servers/sales-server.js",
+    "start:report": "node dist/servers/report-server.js",
+    "demo": "node dist/scripts/demo-client.js",
+    "test:smoke": "node dist/scripts/smoke-test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "express": "^5.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

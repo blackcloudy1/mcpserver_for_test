@@ -1,0 +1,36 @@
+services:
+  docs-mcp:
+    build: .
+    command: ["node", "dist/servers/docs-server.js"]
+    environment:
+      PORT: "9101"
+      MCP_HOST: "0.0.0.0"
+      MCP_DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "9101:9101"
+
+  sales-mcp:
+    build: .
+    command: ["node", "dist/servers/sales-server.js"]
+    environment:
+      PORT: "9102"
+      MCP_HOST: "0.0.0.0"
+      MCP_DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "9102:9102"
+
+  report-mcp:
+    build: .
+    command: ["node", "dist/servers/report-server.js"]
+    environment:
+      PORT: "9103"
+      MCP_HOST: "0.0.0.0"
+      MCP_DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "9103:9103"
