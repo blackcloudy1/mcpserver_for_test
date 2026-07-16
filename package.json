@@ -10,6 +10,7 @@
     "start:sales": "node dist/servers/sales-server.js",
     "start:report": "node dist/servers/report-server.js",
     "demo": "node dist/scripts/demo-client.js",
+    "inspect:tools": "node dist/scripts/inspect-tools.js",
     "test:smoke": "node dist/scripts/smoke-test.js"
   },
   "dependencies": {

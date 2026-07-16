@@ -1,0 +1,6 @@
+month,product,customer_id,customer_email,units,revenue
+2026-07,产品A,CUST-A001,alpha@example.test,20,4000
+2026-07,产品A,CUST-A002,beta@example.test,15,3000
+2026-07,产品C,CUST-C001,red@example.test,12,3600
+2026-07,产品C,CUST-C002,blue@example.test,8,2400
+2026-07,产品C,CUST-C003,green@example.test,6,1800

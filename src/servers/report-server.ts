@@ -6,10 +6,13 @@ import { startHttpMcpServer } from "../shared/http-server.js";
 import { dataDir, safeChildPath } from "../shared/paths.js";
 
 const reportsDir = path.join(dataDir, "reports");
+const maxReportBytes = Number(process.env.MCP_MAX_TOOL_RESULT_BYTES ?? 256 * 1024);
 
 function reportFilename(filename: string): string {
-  const base = path.basename(filename);
-  return base.endsWith(".md") ? base : `${base}.md`;
+  // Validate the caller-supplied value before adding the extension. Do not
+  // silently normalize paths such as "../sales.csv" into a safe-looking name.
+  safeChildPath(reportsDir, filename);
+  return filename.endsWith(".md") ? filename : `${filename}.md`;
 }
 
 function createServer(): McpServer {
@@ -21,17 +24,37 @@ function createServer(): McpServer {
   server.registerTool(
     "save_report",
     {
-      description: "Save a completed Markdown business brief.",
+      description: "Write a Markdown business brief into the fixed reports directory. Requires report:write and should require human confirmation.",
       inputSchema: {
         filename: z.string().min(1),
-        content: z.string().min(1)
+        content: z.string().min(1),
+        overwrite: z.boolean().default(false)
       },
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true }
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true }
     },
-    async ({ filename, content }) => {
+    async ({ filename, content, overwrite }) => {
       await mkdir(reportsDir, { recursive: true });
+      if (Buffer.byteLength(content, "utf8") > maxReportBytes) {
+        return {
+          content: [{ type: "text", text: `Report exceeds the ${maxReportBytes}-byte limit` }],
+          isError: true
+        };
+      }
       const normalized = reportFilename(filename);
-      await writeFile(safeChildPath(reportsDir, normalized), content, "utf8");
+      try {
+        await writeFile(safeChildPath(reportsDir, normalized), content, {
+          encoding: "utf8",
+          flag: overwrite ? "w" : "wx"
+        });
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+          return {
+            content: [{ type: "text", text: `${normalized} already exists; set overwrite=true to replace it` }],
+            isError: true
+          };
+        }
+        throw error;
+      }
       const output = { saved: true, filename: normalized, characters: content.length };
       return {
         content: [{ type: "text", text: `Saved ${normalized}` }],

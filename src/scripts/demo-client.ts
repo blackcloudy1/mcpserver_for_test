@@ -1,20 +1,4 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-
-type ToolOutput = Record<string, unknown>;
-
-async function callTool(url: string, name: string, args: Record<string, unknown>): Promise<ToolOutput> {
-  const transport = new StreamableHTTPClientTransport(new URL(url));
-  const client = new Client({ name: "business-brief-demo-client", version: "1.0.0" });
-  await client.connect(transport);
-  try {
-    const result = await client.callTool({ name, arguments: args });
-    if (result.isError) throw new Error(JSON.stringify(result.content));
-    return (result.structuredContent ?? {}) as ToolOutput;
-  } finally {
-    await client.close();
-  }
-}
+import { callTool } from "../shared/mcp-client.js";
 
 const baseHost = process.env.MCP_SERVER_HOST ?? "127.0.0.1";
 const product = process.env.DEMO_PRODUCT ?? "产品A";
@@ -52,7 +36,8 @@ ${regions.map((row, index) => `${index + 1}. ${row.region}：${row.units} 件，
 
 const saved = await callTool(reportUrl, "save_report", {
   filename: `${product}-${month}.md`,
-  content: markdown
+  content: markdown,
+  overwrite: true
 });
 
 console.log(JSON.stringify({ product, month, saved }, null, 2));

@@ -12,6 +12,15 @@ export function startHttpMcpServer(options: {
 }): void {
   const host = process.env.MCP_HOST ?? "0.0.0.0";
   const apiToken = process.env.MCP_API_TOKEN;
+  const maxPending = Number(process.env.MCP_MAX_PENDING_REQUESTS ?? 16);
+  const maxRequestBytes = Number(process.env.MCP_MAX_REQUEST_BYTES ?? 1024 * 1024);
+  const allowedOrigins = new Set(
+    (process.env.MCP_ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map(origin => origin.trim())
+      .filter(Boolean)
+  );
+  let pendingRequests = 0;
   const app = createMcpExpressApp();
 
   app.get("/health", (_req, res) => {
@@ -19,6 +28,18 @@ export function startHttpMcpServer(options: {
   });
 
   app.post("/mcp", async (req: Request, res: Response) => {
+    const origin = req.header("origin");
+    if (origin && allowedOrigins.size > 0 && !allowedOrigins.has(origin)) {
+      res.status(403).json({ error: "origin_not_allowed" });
+      return;
+    }
+
+    const contentLength = Number(req.header("content-length") ?? 0);
+    if (contentLength > maxRequestBytes) {
+      res.status(413).json({ error: "request_too_large" });
+      return;
+    }
+
     if (apiToken) {
       const authorization = req.header("authorization");
       if (authorization !== `Bearer ${apiToken}`) {
@@ -27,10 +48,21 @@ export function startHttpMcpServer(options: {
       }
     }
 
+    if (pendingRequests >= maxPending) {
+      res.status(503).json({ error: "too_many_pending_requests" });
+      return;
+    }
+    pendingRequests += 1;
+
     const server = options.createServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true
+    });
+
+    res.once("close", () => {
+      void transport.close();
+      void server.close();
     });
 
     try {
@@ -46,10 +78,7 @@ export function startHttpMcpServer(options: {
         });
       }
     } finally {
-      res.on("close", () => {
-        void transport.close();
-        void server.close();
-      });
+      pendingRequests -= 1;
     }
   });
 
