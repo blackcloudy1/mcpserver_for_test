@@ -1,0 +1,22 @@
+# Optional local-interactive profile.
+# It keeps host bindings on 127.0.0.1 but adds a non-internal bridge so Docker
+# Desktop can publish ports. Use synthetic data only while this override is on.
+services:
+  docs-mcp:
+    networks: [lab-net, host-access]
+  sales-mcp:
+    networks: [lab-net, host-access]
+  report-mcp:
+    networks: [lab-net, host-access]
+  opa:
+    networks: [lab-net, host-access]
+  security-lab:
+    networks: [lab-net, host-access]
+  mock-egress:
+    networks: [lab-net, host-access]
+  phoenix:
+    networks: [lab-net, host-access]
+
+networks:
+  host-access:
+    driver: bridge

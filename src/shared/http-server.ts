@@ -20,8 +20,19 @@ export function startHttpMcpServer(options: {
       .map(origin => origin.trim())
       .filter(Boolean)
   );
+  const allowedHosts = (process.env.MCP_ALLOWED_HOSTS ?? "")
+    .split(",")
+    .map(value => value.trim())
+    .filter(Boolean);
   let pendingRequests = 0;
-  const app = createMcpExpressApp();
+
+  // Keep the SDK's DNS-rebinding policy consistent with the address passed to
+  // app.listen(). Previously createMcpExpressApp() defaulted to 127.0.0.1 and
+  // rejected valid Docker service names even though the server bound 0.0.0.0.
+  const app = createMcpExpressApp({
+    host,
+    ...(allowedHosts.length > 0 ? { allowedHosts } : {})
+  });
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", server: options.name });
@@ -98,3 +109,4 @@ export function startHttpMcpServer(options: {
     console.log(`[${options.name}] http://${host}:${options.port}/mcp`);
   });
 }
+
