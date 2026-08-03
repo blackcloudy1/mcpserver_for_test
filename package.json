@@ -6,6 +6,7 @@
   "description": "A small LAN-ready MCP toolchain for generating business briefs.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "start:all": "node dist/scripts/start-all.js",
     "start:docs": "node dist/servers/docs-server.js",
     "start:sales": "node dist/servers/sales-server.js",
     "start:report": "node dist/servers/report-server.js",

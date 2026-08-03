@@ -1,7 +1,0 @@
-FROM agent-security-testbed-agentdojo:latest
-
-USER root
-RUN pip install "mcp>=1.12,<2"
-COPY mcp_victim_agent.py /usr/local/bin/mcp_victim_agent.py
-USER dojo
-

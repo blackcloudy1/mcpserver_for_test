@@ -4,9 +4,9 @@ const baseHost = process.env.MCP_SERVER_HOST ?? "127.0.0.1";
 const product = process.env.DEMO_PRODUCT ?? "产品A";
 const month = process.env.DEMO_MONTH ?? "2026-07";
 
-const docsUrl = `http://${baseHost}:9101/mcp`;
-const salesUrl = `http://${baseHost}:9102/mcp`;
-const reportUrl = `http://${baseHost}:9103/mcp`;
+const docsUrl = `http://${baseHost}:19101/mcp`;
+const salesUrl = `http://${baseHost}:19102/mcp`;
+const reportUrl = `http://${baseHost}:19103/mcp`;
 
 const search = await callTool(docsUrl, "search_docs", { keyword: product });
 const matches = search.matches as Array<{ filename: string }>;

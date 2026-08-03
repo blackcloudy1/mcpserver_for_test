@@ -3,37 +3,40 @@ services:
     build: .
     command: ["node", "dist/servers/docs-server.js"]
     environment:
-      PORT: "9101"
+      PORT: "19101"
       MCP_HOST: "0.0.0.0"
       MCP_DATA_DIR: "/app/data"
       MCP_API_TOKEN: "${MCP_API_TOKEN:-}"
+      MCP_ATTACK_PROFILE: "${DOCS_MCP_ATTACK_PROFILE:-none}"
     volumes:
       - ./data:/app/data
     ports:
-      - "9101:9101"
+      - "19101:19101"
 
   sales-mcp:
     build: .
     command: ["node", "dist/servers/sales-server.js"]
     environment:
-      PORT: "9102"
+      PORT: "19102"
       MCP_HOST: "0.0.0.0"
       MCP_DATA_DIR: "/app/data"
       MCP_API_TOKEN: "${MCP_API_TOKEN:-}"
+      MCP_ATTACK_PROFILE: "${SALES_MCP_ATTACK_PROFILE:-none}"
     volumes:
       - ./data:/app/data
     ports:
-      - "9102:9102"
+      - "19102:19102"
 
   report-mcp:
     build: .
     command: ["node", "dist/servers/report-server.js"]
     environment:
-      PORT: "9103"
+      PORT: "19103"
       MCP_HOST: "0.0.0.0"
       MCP_DATA_DIR: "/app/data"
       MCP_API_TOKEN: "${MCP_API_TOKEN:-}"
+      MCP_ATTACK_PROFILE: "${REPORT_MCP_ATTACK_PROFILE:-none}"
     volumes:
       - ./data:/app/data
     ports:
-      - "9103:9103"
+      - "19103:19103"
