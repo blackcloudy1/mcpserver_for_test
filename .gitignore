@@ -2,3 +2,4 @@ node_modules/
 dist/
 data/reports/*.md
 !data/reports/.gitkeep
+.artifacts/remote_fix_20260802/
